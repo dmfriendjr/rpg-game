@@ -5,28 +5,36 @@
 	<title>RPG Game</title>
 	<link rel="stylesheet" href="css/reset.css">
 	<link rel="stylesheet" href="css/style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=Spectral+SC" rel="stylesheet">
 </head>
 <body>
-	<h1>RPG Game</h1>
+	<h1 class='title-text'>The Roman Coliseum</h1>
 
-	<div class="character-container">
-	</div>
+	<div class="wrapper">
+		<div class="character-container">
+			<h2 class="prompt-text">Choose Your Warrior</h2>
+		</div>
 
-	<div class="player-character-container">
-	</div>
+		<div class="combat-area-wrapper">
+			<div class="player-character-container">
+			</div>
+			<div class="enemy-character-container">
+			</div>
+			<div class="combat-log-container">
+				<div class="attack-button-container">		
+				</div>
 
-	<div class="attack-button-container">		
-	</div>
-	
-	<div class="enemy-character-container">
-	</div>
+				<p class="player-combat-log combat-log"></p>
+				<p class="enemy-combat-log combat-log"></p>
+				<p class="combat-result-log combat-log"></p>
+			</div>
+		</div>
 
-	<div class="combat-log-container">
-	</div>
 
-	<div class="reset-button-container">
+		<div class="reset-button-container">
+		</div>
 	</div>
 
 	<script src="scripts/script.js"></script>

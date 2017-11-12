@@ -1,75 +1,86 @@
-body {
-	font-family: 'Spectral SC', serif;
-	margin: 25px 15%;
+.character-container,
+.player-character-container,
+.enemy-character-container,
+.combat-log-container {
+	border: 3px outset lightgrey;
 }
 
+html {
+/*	background: url(../images/background.png);
+	background-repeat: repeat;*/
+}
+
+body {
+	width: 85vw;
+	margin: 15px auto 0 auto;
+	text-align: center;
+	font-family: 'Spectral SC', serif;
+}
+
+.title-text {
+	font-size: 35px;
+	font-weight: bold;
+}
+
+.character-container {
+	max-width: 50vw;
+	max-height: 33vh;
+	margin: 15px auto;
+}
+
+.prompt-text {
+	font-size: 25px;
+	text-decoration: underline;
+}
 
 .character-wrapper {
 	display: inline-block;
-	margin: 15px 15px;
-	position: relative;
-}
-
-.character-wrapper > img {
-	width: 200px;
-	height: 260px;
+	border: 3px outset lightgrey;
+	margin: 10px 10px 10px 10px;
 }
 
 .character-name {
-	text-align: center;
+	border-bottom: 2px outset lightgrey;
+	padding: 5px 0;
+	font-weight: bold;
+	font-style: italic;
 }
 
-.character-stats {
-	position: absolute;
-	bottom: 10%;
-	left: 27%;
-	background-color: rgba(0,255,0,1);
-	border: 2px solid black;
-	border-radius: 50%;
-	padding: 10px;
-	color: white;
+.character-wrapper img {
+	max-width: 15vw;
+	max-height: 20vh;
 }
 
-.character-container,
-.player-character-container,
+
+.player-character-container, 
 .enemy-character-container {
-	text-align: center;
-	border: 3px outset lightgrey;
-	margin: 15px 10px;
-	min-width: 265px;
-	min-height: 315px;
-}
-
-.attack-button-container {
 	display: inline-block;
 }
 
-.player-character-container {
-	float: left;
-	border-color: green;
+.combat-log-container {
+	font-size: 14px;
+	max-width: 20vw;
+	min-height: 50px;
+	margin: 15px auto;
+	justify-content: center;
+	padding: 5px 5px;
 }
 
-.enemy-character-container {
-	float: right;
-	border-color: red;
+.player-combat-log {
+	margin-top: 10px;
 }
 
 #attack-button {
-	vertical-align: center;
-	font-size: 500px;
+	float: left;
+	min-height: 40px;
+	border: 2px outset grey;
+	margin: 5px 5px;
 }
 
-.damage-display {
-	position: absolute;
-	bottom: 25%;
-	left: 45%;
-	color: red;
-	animation: floatup 2s linear;
-	font-size: 25px;
+#attack-button:active {
+	border: 2px inset grey;
 }
 
-@keyframes floatup {
-	0% { transform: translateY(0px); }
-	80% { opacity: 1; }
-	100% { transform: translateY(-100px); opacity: 0; }
+#attack-button:focus {
+	outline: none;
 }

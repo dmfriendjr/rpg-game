@@ -1,4 +1,4 @@
-
+var game;
 
 function Character(name, startingHealth, baseAttackPower, counterAttackPower, isPlayer) {
 	this.name = name;
@@ -8,6 +8,7 @@ function Character(name, startingHealth, baseAttackPower, counterAttackPower, is
 	this.baseAttackPower = baseAttackPower;
 	this.counterAttackPower = counterAttackPower;
 	this.isPlayer = isPlayer;
+	this.lastDamageRecieved;
 	
 	this.dealDamage = function(targetCharacter) {
 		targetCharacter.recieveDamage(this, this.attackPower);
@@ -18,13 +19,11 @@ function Character(name, startingHealth, baseAttackPower, counterAttackPower, is
 
 	this.recieveDamage = function(attackingCharacter, damageAmount) {
 		this.health -= damageAmount;
+		this.lastDamageRecieved = damageAmount;
 		//We need to counter attack if not the player
 		if (!this.isPlayer) {
 			attackingCharacter.recieveDamage(this, this.counterAttackPower);
 		}
-
-		//Console logs
-		console.log(`${this.name} recieved ${damageAmount} damage!! Health is ${this.health}`);
 	};
 
 	this.isDead = function() {
@@ -32,7 +31,7 @@ function Character(name, startingHealth, baseAttackPower, counterAttackPower, is
 	};
 }
 
-function rpgGame() {
+function RpgGame() {
 	this.characters = [];
 	this.possibleNames = ['Spartacus','Hermes','Tetraites','Crixus','Flamma','Carpophorus'];
 	this.playerCharacter;
@@ -64,6 +63,11 @@ function rpgGame() {
 			$('.character-container').append(characterDiv);
 		}
 
+		//Hide currently unused HTML elements
+		$('.player-character-container').hide();
+		$('.enemy-character-container').hide();
+		$('.combat-log-container').hide();
+
 		$('.character-wrapper').on('click', this.activateCharacter.bind(this));
 	};
 
@@ -78,9 +82,12 @@ function rpgGame() {
 			this.playerCharacter.isPlayer = true;
 			//Move to player div
 			$('.player-character-container').append(event.currentTarget);
+			$('.player-character-container').show();
 			$(this).remove();
 			//Player has been picked
 			this.playerCharacterPicked = true;
+			//Change prompt text
+			$('.prompt-text').html('Choose Your Opponent');
 		}
 		//Enemy hasn't picked, set character as enemy
 		else if (!this.enemyCharacterPicked)
@@ -99,6 +106,12 @@ function rpgGame() {
 			//Insert attack button into HTML
 			$('.attack-button-container').html('<input type="button" id="attack-button" value="Attack">');
 			$('#attack-button').on('click', this.handleAttack.bind(this));
+			//Show combat and enemy HTML elements
+			$('.enemy-character-container').show();
+			$('.combat-result-log').html('');
+			$('.player-combat-log').html('');
+			$('.enemy-combat-log').html('');
+			$('.combat-log-container').show();
 		}
 	};
 
@@ -117,19 +130,24 @@ function rpgGame() {
 		let enemyHealthColor = ((this.enemyCharacter.health/this.enemyCharacter.baseHealth) * 255).toFixed(0);
 		$('.enemy-character-container > .character-wrapper > .character-stats').html(`Health: ${this.enemyCharacter.health}`);
 		$('.enemy-character-container > .character-wrapper > .character-stats').attr('style', `background-color: rgba(${255-enemyHealthColor},${0+enemyHealthColor},0,1)`);
-
+		//Update combat log
+		$('.player-combat-log').html(`You recieved ${this.playerCharacter.lastDamageRecieved} damage!`);
+		$('.enemy-combat-log').html(`${this.enemyCharacter.name} recieved ${this.enemyCharacter.lastDamageRecieved} damage!`);
 
 		//Check for deaths after this damage round
 		if (this.playerCharacter.isDead()) {
-			console.log(`${this.playerCharacter.name} is dead! You lose.`);
+			$('.combat-result-log').html(`${this.playerCharacter.name} is dead! You lose.`);
 			$('.player-character-container > .character-wrapper').remove();
+			$('.player-character-container').hide();
 			this.resetPlayer();
 		} // Player death takes priority over enemy death
 		else if (this.enemyCharacter.isDead()) {
-			console.log(`${this.enemyCharacter.name} is dead! You win this round...`);
-			//Remove attack button from HTML
+			$('.combat-result-log').html(`${this.enemyCharacter.name} is dead! You win this round...`);
+			//Remove attack button and enemy container from HTML
 			$('.attack-button-container').html('');
+			$('.enemy-character-container').hide();
 			this.resetEnemy();
+
 		}
 	}
 
@@ -146,7 +164,13 @@ function rpgGame() {
 		$('.attack-button-container').html('');
 		$('.enemy-character-container').html('');
 		$('.reset-button-container').html('');
-		game = new rpgGame();
+		$('.player-combat-log').html('');
+		$('.enemy-combat-log').html('');
+		$('.combat-result-log').html('');
+		$('.player-character-container').hide();
+		$('.enemy-character-container').hide();
+		$('.combat-log-container').hide();
+		game = new RpgGame();
 		game.initialize();
 	}
 
@@ -162,5 +186,7 @@ function rpgGame() {
 	};
 }
 
-var game = new rpgGame();
-game.initialize();
+$(document).ready(function() {
+	game = new RpgGame();
+	game.initialize();
+});
