@@ -39,6 +39,7 @@ function rpgGame() {
 	this.playerCharacterPicked = false;
 	this.enemyCharacter;
 	this.enemyCharacterPicked = false;
+	this.activeDamageText = [];
 
 	this.initialize = function () {
 		//Create some random characters
@@ -46,7 +47,7 @@ function rpgGame() {
 			this.characters.push(new Character(this.possibleNames[Math.floor(Math.random() * this.possibleNames.length)], //Set name
 								this.getRandomInt(90,150), //Set starting health
 								this.getRandomInt(5,15), // Set base attack power
-								this.getRandomInt(5,10) // Set counter attack power
+								this.getRandomInt(5,30) // Set counter attack power
 								,false)); // None of the characters are player to start
 			//Remove used name from possibilities
 			this.possibleNames.splice(this.possibleNames.indexOf(this.name), 1);
@@ -56,7 +57,7 @@ function rpgGame() {
 			characterDiv.attr('class', 'character-wrapper');
 			characterDiv.html(`
 				<h1 class='character-name'>${this.characters[i].name}</h1>
-				<img src="http://via.placeholder.com/200x200" alt="${this.characters[i].name} Picture">
+				<img src="images/gladiator${i+1}.png" alt="${this.characters[i].name} Picture">
 				<p class='character-stats'>Health: ${this.characters[i].baseHealth}</p>
 				`);
 			characterDiv.data('character',this.characters[i]);
@@ -64,7 +65,6 @@ function rpgGame() {
 		}
 
 		$('.character-wrapper').on('click', this.activateCharacter.bind(this));
-		$('#attack-button').on('click', this.handleAttack.bind(this));
 	};
 
 	//This could be cleaned up a
@@ -85,31 +85,69 @@ function rpgGame() {
 		//Enemy hasn't picked, set character as enemy
 		else if (!this.enemyCharacterPicked)
 		{
+			//Character clicked is currently player character, do nothing
+			if ($(event.currentTarget).data('character').isPlayer) {
+				return;
+			}
+
 			this.enemyCharacter = $(event.currentTarget).data('character');
 			//Move to enemy div
 			$('.enemy-character-container').append(event.currentTarget);
 			$(this).remove();
 			//Enemy has been picked
 			this.enemyCharacterPicked = true;
+			//Insert attack button into HTML
+			$('.attack-button-container').html('<input type="button" id="attack-button" value="Attack">');
+			$('#attack-button').on('click', this.handleAttack.bind(this));
 		}
 	};
 
 	this.handleAttack = function(event) {
 		//Ensure player and enemy are picked
-		if (!this.playerCharacterPicked || !this.enemyCharacterPicked) {
+		if (!this.playerCharacterPicked || !this.enemyCharacterPicked || this.playerCharacter.isDead()) {
 			return;
 		}
 
 		this.playerCharacter.dealDamage(this.enemyCharacter);
 
+		//Update displayed healths
+		$('.player-character-container > .character-wrapper > .character-stats').html(`Health: ${this.playerCharacter.health}`);
+		let playerHealthColor = ((this.playerCharacter.health/this.playerCharacter.baseHealth) * 255).toFixed(0);
+		$('.player-character-container > .character-wrapper > .character-stats').attr('style', `background-color: rgba(${255-playerHealthColor},${0+playerHealthColor},0,1)`);
+		let enemyHealthColor = ((this.enemyCharacter.health/this.enemyCharacter.baseHealth) * 255).toFixed(0);
+		$('.enemy-character-container > .character-wrapper > .character-stats').html(`Health: ${this.enemyCharacter.health}`);
+		$('.enemy-character-container > .character-wrapper > .character-stats').attr('style', `background-color: rgba(${255-enemyHealthColor},${0+enemyHealthColor},0,1)`);
+
+
 		//Check for deaths after this damage round
 		if (this.playerCharacter.isDead()) {
 			console.log(`${this.playerCharacter.name} is dead! You lose.`);
-		}
+			$('.player-character-container > .character-wrapper').remove();
+			this.resetPlayer();
+		} // Player death takes priority over enemy death
 		else if (this.enemyCharacter.isDead()) {
 			console.log(`${this.enemyCharacter.name} is dead! You win this round...`);
+			//Remove attack button from HTML
+			$('.attack-button-container').html('');
 			this.resetEnemy();
 		}
+	}
+
+	this.resetPlayer = function() {
+		//Insert restart button into html
+		$('.reset-button-container').html('<input type="button" id="restart-button" value="Restart">');
+		$('#restart-button').on('click', this.restartGame.bind(this));
+	}
+
+	this.restartGame = function () {
+		//Reset html before instantiating new game
+		$('.character-container').html('');
+		$('.player-character-container').html('');
+		$('.attack-button-container').html('');
+		$('.enemy-character-container').html('');
+		$('.reset-button-container').html('');
+		game = new rpgGame();
+		game.initialize();
 	}
 
 	this.resetEnemy = function() {
