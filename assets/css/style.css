@@ -1,13 +1,14 @@
 .character-container,
-.player-character-container,
-.enemy-character-container,
+.player-combat-container,
+.enemy-combat-container,
 .combat-log-container {
 	border: 3px outset lightgrey;
+	background-color: white;
 }
 
 html {
-/*	background: url(../images/background.png);
-	background-repeat: repeat;*/
+	background: url(../images/background.png);
+	background-repeat: repeat;
 }
 
 body {
@@ -24,7 +25,6 @@ body {
 
 .character-container {
 	max-width: 50vw;
-	max-height: 33vh;
 	margin: 15px auto;
 }
 
@@ -52,9 +52,14 @@ body {
 }
 
 
-.player-character-container, 
-.enemy-character-container {
+.player-combat-container, 
+.enemy-combat-container {
 	display: inline-block;
+}
+
+.combat-character-label {
+	margin-top: 10px;
+	text-decoration: underline;
 }
 
 .combat-log-container {
@@ -70,17 +75,20 @@ body {
 	margin-top: 10px;
 }
 
-#attack-button {
-	float: left;
+#reset-button, #attack-button {
 	min-height: 40px;
 	border: 2px outset grey;
 	margin: 5px 5px;
 }
 
-#attack-button:active {
+#attack-button {
+	float: left;
+}
+
+#attack-button:active, #reset-button:active {
 	border: 2px inset grey;
 }
 
-#attack-button:focus {
+#attack-button:focus, #reset-button:focus {
 	outline: none;
 }

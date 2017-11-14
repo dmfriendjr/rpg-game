@@ -39,6 +39,21 @@ function RpgGame() {
 	this.enemyCharacter;
 	this.enemyCharacterPicked = false;
 	this.activeDamageText = [];
+	this.htmlElements = {
+		promptText: $('.prompt-text'),
+		characterContainer: $('.character-container'),
+		playerCombatContainer: $('.player-combat-container'),
+		enemyCombatContainer: $('.enemy-combat-container'),
+		combatLogContainer: $('.combat-log-container'),
+		attackButtonContainer: $('.attack-button-container'),
+		playerCombatLog: $('.player-combat-log'),
+		enemyCombatLog: $('.enemy-combat-log'),
+		combatResultLog: $('.combat-result-log'),
+		playerCombatStats: undefined,
+		enemyCombatStats: undefined
+	};
+	this.lastRound = false;
+	this.eventsInitialized = false;
 
 	this.initialize = function () {
 		//Create some random characters
@@ -49,9 +64,9 @@ function RpgGame() {
 								this.getRandomInt(5,30) // Set counter attack power
 								,false)); // None of the characters are player to start
 			//Remove used name from possibilities
-			this.possibleNames.splice(this.possibleNames.indexOf(this.name), 1);
+			this.possibleNames.splice(this.possibleNames.indexOf(this.characters[i].name), 1);
 
-			//Create html elements for each generated character
+			//Create html elements for each generated character and append to container
 			let characterDiv = $('<div>');
 			characterDiv.attr('class', 'character-wrapper');
 			characterDiv.html(`
@@ -60,58 +75,77 @@ function RpgGame() {
 				<p class='character-stats'>Health: ${this.characters[i].baseHealth}</p>
 				`);
 			characterDiv.data('character',this.characters[i]);
-			$('.character-container').append(characterDiv);
+			this.htmlElements.characterContainer.append(characterDiv);
 		}
 
-		//Hide currently unused HTML elements
-		$('.player-character-container').hide();
-		$('.enemy-character-container').hide();
-		$('.combat-log-container').hide();
+		//Hide currently unused combat HTML elements
+		this.htmlElements.playerCombatContainer.hide();
+		this.htmlElements.enemyCombatContainer.hide();
+		this.htmlElements.combatLogContainer.hide();
+		//Update prompt text
+		this.htmlElements.promptText.html('Choose Your Warrior');
+
 
 		$('.character-wrapper').on('click', this.activateCharacter.bind(this));
+			this.eventsInitialized = true;
 	};
 
-	//This could be cleaned up a
-	//a 
-	//lot
+	//Function handle a click on a character-wrapper
 	this.activateCharacter = function(event) {
+		let targetDiv = $(event.currentTarget);
+		let targetCharacter = $(event.currentTarget).data('character');
 		//If player hasn't picked, then set character as player character
 		if (!this.playerCharacterPicked)
 		{
-			this.playerCharacter = $(event.currentTarget).data('character');
+			this.playerCharacter = targetCharacter;
 			this.playerCharacter.isPlayer = true;
 			//Move to player div
-			$('.player-character-container').append(event.currentTarget);
-			$('.player-character-container').show();
-			$(this).remove();
+			this.htmlElements.playerCombatContainer.append(targetDiv);
+			this.htmlElements.playerCombatContainer.show();
+
 			//Player has been picked
 			this.playerCharacterPicked = true;
+			//Store player stats element
+			this.htmlElements.playerCombatStats = this.htmlElements.playerCombatContainer.find('.character-wrapper > .character-stats');
 			//Change prompt text
-			$('.prompt-text').html('Choose Your Opponent');
+			this.htmlElements.promptText.html('Choose Your Opponent');
+			//Do stats update so colors are populated
+			this.updatePlayerStats();
 		}
-		//Enemy hasn't picked, set character as enemy
+		//Enemy hasn't picked, set character as enemy if not player
 		else if (!this.enemyCharacterPicked)
 		{
 			//Character clicked is currently player character, do nothing
-			if ($(event.currentTarget).data('character').isPlayer) {
+			if (targetCharacter.isPlayer) {
 				return;
 			}
 
-			this.enemyCharacter = $(event.currentTarget).data('character');
+			this.enemyCharacter = targetCharacter;
 			//Move to enemy div
-			$('.enemy-character-container').append(event.currentTarget);
-			$(this).remove();
+			this.htmlElements.enemyCombatContainer.append(targetDiv);
+
 			//Enemy has been picked
 			this.enemyCharacterPicked = true;
-			//Insert attack button into HTML
-			$('.attack-button-container').html('<input type="button" id="attack-button" value="Attack">');
-			$('#attack-button').on('click', this.handleAttack.bind(this));
-			//Show combat and enemy HTML elements
-			$('.enemy-character-container').show();
-			$('.combat-result-log').html('');
-			$('.player-combat-log').html('');
-			$('.enemy-combat-log').html('');
-			$('.combat-log-container').show();
+
+			//Display enemy with newly appended enemy div
+			this.htmlElements.enemyCombatContainer.show();
+			//Store enemy combat stats element
+			this.htmlElements.enemyCombatStats = this.htmlElements.enemyCombatContainer.find('.character-wrapper > .character-stats');
+			//Do stats update so colors are populated
+			this.updateEnemyStats();
+			//Display and clear combat log
+			this.htmlElements.combatResultLog.html('');
+			this.htmlElements.playerCombatLog.html('');
+			this.htmlElements.enemyCombatLog.html('');
+			this.htmlElements.combatLogContainer.show();
+			//Display attack button
+			this.toggleAttackButton();
+			//Check to ensure character container is not empty
+			if (this.htmlElements.characterContainer.children('.character-wrapper').length === 0) {
+				//No characters left, hide container
+				this.htmlElements.characterContainer.hide();
+				this.lastRound = true;
+			}
 		}
 	};
 
@@ -123,60 +157,105 @@ function RpgGame() {
 
 		this.playerCharacter.dealDamage(this.enemyCharacter);
 
-		//Update displayed healths
-		$('.player-character-container > .character-wrapper > .character-stats').html(`Health: ${this.playerCharacter.health}`);
-		let playerHealthColor = ((this.playerCharacter.health/this.playerCharacter.baseHealth) * 255).toFixed(0);
-		$('.player-character-container > .character-wrapper > .character-stats').attr('style', `background-color: rgba(${255-playerHealthColor},${0+playerHealthColor},0,1)`);
-		let enemyHealthColor = ((this.enemyCharacter.health/this.enemyCharacter.baseHealth) * 255).toFixed(0);
-		$('.enemy-character-container > .character-wrapper > .character-stats').html(`Health: ${this.enemyCharacter.health}`);
-		$('.enemy-character-container > .character-wrapper > .character-stats').attr('style', `background-color: rgba(${255-enemyHealthColor},${0+enemyHealthColor},0,1)`);
+		//Update stats display
+		this.updatePlayerStats();
+		this.updateEnemyStats();
+
 		//Update combat log
-		$('.player-combat-log').html(`You recieved ${this.playerCharacter.lastDamageRecieved} damage!`);
-		$('.enemy-combat-log').html(`${this.enemyCharacter.name} recieved ${this.enemyCharacter.lastDamageRecieved} damage!`);
+		this.htmlElements.playerCombatLog.html(`You recieved ${this.playerCharacter.lastDamageRecieved} damage!`);
+		this.htmlElements.enemyCombatLog.html(`${this.enemyCharacter.name} recieved ${this.enemyCharacter.lastDamageRecieved} damage!`);
 
 		//Check for deaths after this damage round
 		if (this.playerCharacter.isDead()) {
-			$('.combat-result-log').html(`${this.playerCharacter.name} is dead! You lose.`);
-			$('.player-character-container > .character-wrapper').remove();
-			$('.player-character-container').hide();
+			this.htmlElements.combatResultLog.html(`${this.playerCharacter.name} is dead! You lose.`);
 			this.resetPlayer();
 		} // Player death takes priority over enemy death
 		else if (this.enemyCharacter.isDead()) {
-			$('.combat-result-log').html(`${this.enemyCharacter.name} is dead! You win this round...`);
-			//Remove attack button and enemy container from HTML
-			$('.attack-button-container').html('');
-			$('.enemy-character-container').hide();
-			this.resetEnemy();
+			if (!this.lastRound)
+			{
+				this.htmlElements.combatResultLog.html(`${this.enemyCharacter.name} is dead! You win this round...`);
+				this.resetEnemy();
+			}
+			else
+			{
+				this.htmlElements.combatResultLog.html(`${this.enemyCharacter.name} is dead! You are the champion!!!`);
+				this.resetEnemy();
+				//Insert restart button into html
+				$('.reset-button-container').html('<input type="button" id="reset-button" value="Restart">');
+				$('#reset-button').on('click', this.restartGame.bind(this));
+			}
 
 		}
 	}
 
+	this.updatePlayerStats = function () {
+		//Update displayed player health
+		this.htmlElements.playerCombatStats.html(`Health: ${this.playerCharacter.health}`);
+		//Change color of stats background to match health percentage
+		let playerHealthColor = this.calculateHealthRGB(this.playerCharacter.health, this.playerCharacter.baseHealth);
+		this.htmlElements.playerCombatStats.attr('style', `background-color: rgba(${255-playerHealthColor},${0+playerHealthColor},0,1)`);
+	}
+
+	this.updateEnemyStats = function () {
+		//Update displayed enemy health
+		this.htmlElements.enemyCombatStats.html(`Health: ${this.enemyCharacter.health}`);
+		//Change color of stats background to match health percentage	
+		let enemyHealthColor = this.calculateHealthRGB(this.enemyCharacter.health, this.enemyCharacter.baseHealth);	
+		this.htmlElements.enemyCombatStats.attr('style', `background-color: rgba(${255-enemyHealthColor},${0+enemyHealthColor},0,1)`);
+	}
+
+	this.calculateHealthRGB = function(current,max) {
+		return ((current/max) * 255).toFixed(0);
+	}
+
 	this.resetPlayer = function() {
+		//Remove attack button
+		this.toggleAttackButton();
+		this.htmlElements.attackButtonContainer.html('');
+		//Hide player combat container and remove player from it
+		this.htmlElements.playerCombatContainer.children('.character-wrapper').remove();
+		this.htmlElements.playerCombatContainer.hide();
 		//Insert restart button into html
-		$('.reset-button-container').html('<input type="button" id="restart-button" value="Restart">');
-		$('#restart-button').on('click', this.restartGame.bind(this));
+		$('.reset-button-container').html('<input type="button" id="reset-button" value="Restart">');
+		$('#reset-button').on('click', this.restartGame.bind(this));
+	}
+
+	this.resetEnemy = function() {
+		//Remove attack button
+		this.toggleAttackButton();
+		this.htmlElements.attackButtonContainer.html('');
+		//Hide enemy combat container and remove character from it
+		this.htmlElements.enemyCombatContainer.hide();
+		this.htmlElements.enemyCombatContainer.children('.character-wrapper').remove();
+		this.enemyCharacterPicked = false;
+	}
+
+	this.toggleAttackButton = function() {
+		if (this.htmlElements.attackButtonContainer.children('#attack-button').length !== 0) {
+			//Disable attack button
+			this.htmlElements.attackButtonContainer.html('');
+		}
+		else
+		{
+			//Insert attack button into HTML and listen for clicks
+			this.htmlElements.attackButtonContainer.html('<input type="button" id="attack-button" value="Attack">');
+			$('#attack-button').on('click', this.handleAttack.bind(this));
+		}
 	}
 
 	this.restartGame = function () {
 		//Reset html before instantiating new game
-		$('.character-container').html('');
-		$('.player-character-container').html('');
-		$('.attack-button-container').html('');
-		$('.enemy-character-container').html('');
+		this.htmlElements.characterContainer.children().remove('.character-wrapper');
+		this.htmlElements.playerCombatContainer.html('');
+		this.htmlElements.enemyCombatContainer.html('');
+		this.htmlElements.attackButtonContainer.html('');
+		this.htmlElements.playerCombatLog.html('');
+		this.htmlElements.enemyCombatLog.html('');
+		this.htmlElements.combatResultLog.html('');
 		$('.reset-button-container').html('');
-		$('.player-combat-log').html('');
-		$('.enemy-combat-log').html('');
-		$('.combat-result-log').html('');
-		$('.player-character-container').hide();
-		$('.enemy-character-container').hide();
-		$('.combat-log-container').hide();
+		//Create new RPG game and initalize
 		game = new RpgGame();
 		game.initialize();
-	}
-
-	this.resetEnemy = function() {
-		$('.enemy-character-container > .character-wrapper').remove();
-		this.enemyCharacterPicked = false;
 	}
 
 	this.getRandomInt = function(min, max) {
