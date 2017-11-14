@@ -78,6 +78,9 @@ function RpgGame() {
 			this.htmlElements.characterContainer.append(characterDiv);
 		}
 
+		//Ensure character container is being displayed
+		this.htmlElements.characterContainer.show();
+
 		//Hide currently unused combat HTML elements
 		this.htmlElements.playerCombatContainer.hide();
 		this.htmlElements.enemyCombatContainer.hide();
