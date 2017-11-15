@@ -71,7 +71,7 @@ function RpgGame() {
 			characterDiv.attr('class', 'character-wrapper');
 			characterDiv.html(`
 				<h1 class='character-name'>${this.characters[i].name}</h1>
-				<img src="images/gladiator${i+1}.png" alt="${this.characters[i].name} Picture">
+				<img src="assets/images/gladiator${i+1}.png" alt="${this.characters[i].name} Picture">
 				<p class='character-stats'>Health: ${this.characters[i].baseHealth}</p>
 				`);
 			characterDiv.data('character',this.characters[i]);
