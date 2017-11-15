@@ -153,7 +153,7 @@ function RpgGame() {
 	};
 
 	this.handleAttack = function(event) {
-		//Ensure player and enemy are picked
+		//Ensure player and enemy are picked or player isn't dead
 		if (!this.playerCharacterPicked || !this.enemyCharacterPicked || this.playerCharacter.isDead()) {
 			return;
 		}
