@@ -21,6 +21,7 @@ body {
 .title-text {
 	font-size: 35px;
 	font-weight: bold;
+	margin: 15px 0;
 }
 
 .character-container {
@@ -31,6 +32,7 @@ body {
 .prompt-text {
 	font-size: 25px;
 	text-decoration: underline;
+	margin: 10px 0;
 }
 
 .character-wrapper {
@@ -48,7 +50,11 @@ body {
 
 .character-wrapper img {
 	max-width: 15vw;
-	max-height: 20vh;
+	max-height: 25vh;
+}
+
+.character-wrapper .charater-stats {
+	margin: 50px 0;
 }
 
 
@@ -63,16 +69,16 @@ body {
 }
 
 .combat-log-container {
-	font-size: 14px;
+	font-size: 16px;
 	max-width: 20vw;
 	min-height: 50px;
-	margin: 15px auto;
 	justify-content: center;
+	margin: 15px auto;
 	padding: 5px 5px;
 }
 
-.player-combat-log {
-	margin-top: 10px;
+.player-combat-log, .enemy-combat-log {
+	margin: 5px 0;
 }
 
 #reset-button, #attack-button {
