@@ -12,7 +12,7 @@ html {
 }
 
 body {
-	width: 85vw;
+	width: 90vw;
 	margin: 15px auto 0 auto;
 	text-align: center;
 	font-family: 'Spectral SC', serif;
@@ -25,20 +25,20 @@ body {
 }
 
 .character-container {
-	max-width: 50vw;
+	max-width: max-content;
 	margin: 15px auto;
 }
 
 .prompt-text {
 	font-size: 25px;
 	text-decoration: underline;
-	margin: 10px 0;
+	margin: 10px 10px;
 }
 
 .character-wrapper {
 	display: inline-block;
 	border: 3px outset lightgrey;
-	margin: 10px 10px 10px 10px;
+	margin: 10px 10px;
 }
 
 .character-name {
@@ -49,18 +49,18 @@ body {
 }
 
 .character-wrapper img {
-	max-width: 15vw;
-	max-height: 25vh;
+	max-height: 200px;
+	max-height: auto;
 }
 
 .character-wrapper .charater-stats {
 	margin: 50px 0;
 }
 
-
 .player-combat-container, 
 .enemy-combat-container {
 	display: inline-block;
+	margin: 10px 10px;
 }
 
 .combat-character-label {
@@ -70,7 +70,7 @@ body {
 
 .combat-log-container {
 	font-size: 16px;
-	max-width: 20vw;
+	max-width: max-content;
 	min-height: 50px;
 	justify-content: center;
 	margin: 15px auto;
@@ -85,10 +85,6 @@ body {
 	min-height: 40px;
 	border: 2px outset grey;
 	margin: 5px 5px;
-}
-
-#attack-button {
-	float: left;
 }
 
 #attack-button:active, #reset-button:active {

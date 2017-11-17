@@ -183,9 +183,10 @@ function RpgGame() {
 			{
 				this.htmlElements.combatResultLog.html(`${this.enemyCharacter.name} is dead! You are the champion!!!`);
 				this.resetEnemy();
-				//Insert restart button into html
-				$('.reset-button-container').html('<input type="button" id="reset-button" value="Restart">');
-				$('#reset-button').on('click', this.restartGame.bind(this));
+				// //Insert restart button into html
+				// this.htmlElements.attackButtonContainer.html('<input type="button" id="reset-button" value="Restart">');
+				// $('#reset-button').on('click', this.restartGame.bind(this));
+				this.enableResetButton();
 			}
 
 		}
@@ -218,9 +219,10 @@ function RpgGame() {
 		//Hide player combat container and remove player from it
 		this.htmlElements.playerCombatContainer.children('.character-wrapper').remove();
 		this.htmlElements.playerCombatContainer.hide();
-		//Insert restart button into html
-		$('.reset-button-container').html('<input type="button" id="reset-button" value="Restart">');
-		$('#reset-button').on('click', this.restartGame.bind(this));
+		// //Insert restart button into html
+		// $('.reset-button-container').html('<input type="button" id="reset-button" value="Restart">');
+		// $('#reset-button').on('click', this.restartGame.bind(this));
+		this.enableResetButton();
 	}
 
 	this.resetEnemy = function() {
@@ -246,11 +248,19 @@ function RpgGame() {
 		}
 	}
 
+	this.enableResetButton = function() {
+		//Insert restart button into html
+		this.htmlElements.attackButtonContainer.html('<input type="button" id="reset-button" value="Restart">');
+		$('#reset-button').on('click', this.restartGame.bind(this));
+	}
+
 	this.restartGame = function () {
 		//Reset html before instantiating new game
+		//Ensure all characters are removed, cant clear these due to other HTML present
 		this.htmlElements.characterContainer.children().remove('.character-wrapper');
-		this.htmlElements.playerCombatContainer.html('');
-		this.htmlElements.enemyCombatContainer.html('');
+		this.htmlElements.enemyCombatContainer.children('.character-wrapper').remove();
+		this.htmlElements.playerCombatContainer.children('.character-wrapper').remove();
+		//Clear other HTML elements
 		this.htmlElements.attackButtonContainer.html('');
 		this.htmlElements.playerCombatLog.html('');
 		this.htmlElements.enemyCombatLog.html('');
