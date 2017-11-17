@@ -1,14 +1,14 @@
 var game;
 
 class Character {
-	constructor(name, startingHealth, baseAttackPower, counterAttackPower, isPlayer) {
+	constructor(name, startingHealth, baseAttackPower, counterAttackPower) {
 		this.name = name;
 		this.health = startingHealth;
 		this.baseHealth = startingHealth;
 		this.attackPower = baseAttackPower;
 		this.baseAttackPower = baseAttackPower;
 		this.counterAttackPower = counterAttackPower;
-		this.isPlayer = isPlayer;
+		this.isPlayer = false;
 		this.lastDamageRecieved;
 	}
 	
@@ -61,10 +61,9 @@ class RpgGame {
 		//Create some random characters
 		for (var i = 0; i < 4; i++) {
 			let newCharacter = new Character(this.possibleNames[Math.floor(Math.random() * this.possibleNames.length)], //Set name
-								this.getRandomInt(90,150), //Set starting health
-								this.getRandomInt(5,15), // Set base attack power
-								this.getRandomInt(5,30) // Set counter attack power
-								,false); // None of the characters are player to start
+								this.getRandomInt(90,125), //Set starting health
+								this.getRandomInt(5,20), // Set base attack power
+								this.getRandomInt(5,25)); // Set counter attack power
 			//Remove used name from possibilities
 			this.possibleNames.splice(this.possibleNames.indexOf(newCharacter.name), 1);
 
