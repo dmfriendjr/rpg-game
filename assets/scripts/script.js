@@ -13,6 +13,7 @@ class Character {
 	}
 	
 	dealDamage(targetCharacter) {
+		console.log(this);
 		targetCharacter.recieveDamage(this, this.attackPower);
 		if (this.isPlayer) {
 			this.attackPower += this.baseAttackPower;
@@ -54,7 +55,7 @@ class RpgGame {
 				combatResultLog: $('.combat-result-log'),
 				playerCombatStats: undefined,
 				enemyCombatStats: undefined
-		}
+			}
 	}
 
 	initialize() {
@@ -91,12 +92,6 @@ class RpgGame {
 		this.htmlElements.promptText.html('Choose Your Warrior');
 
 		$('.character-wrapper').on('click', this.activateCharacter.bind(this));
-	}
-
-	getRandomInt (min, max) {
-		min = Math.ceil(min);
-		max = Math.floor(max);
-  		return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 	}
 
 	activateCharacter(event) {
