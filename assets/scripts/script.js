@@ -13,7 +13,6 @@ class Character {
 	}
 	
 	dealDamage(targetCharacter) {
-		console.log(this);
 		targetCharacter.recieveDamage(this, this.attackPower);
 		if (this.isPlayer) {
 			this.attackPower += this.baseAttackPower;
